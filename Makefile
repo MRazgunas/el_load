@@ -1,11 +1,11 @@
 # Compiler options here.
-USE_OPT = -O2 -ggdb -fomit-frame-pointer -falign-functions=16
-
+USE_OPT = -O2 -fomit-frame-pointer -falign-functions=16
+USE_OPT += -fno-exceptions
 # C specific options here (added to USE_OPT).
-USE_COPT = 
+USE_COPT =
 
 # C++ specific options here (added to USE_OPT).
-USE_CPPOPT = -fno-rtti
+USE_CPPOPT = -std=c++03 -fno-rtti -fno-threadsafe-statics
 
 # Enable this if you want the linker to remove unused code and data
 USE_LINK_GC = yes
@@ -28,6 +28,8 @@ USE_VERBOSE_COMPILE = no
 
 PROJECT = el_load
 
+UDEFS = -DFW_VERSION_MAJOR=0 -DFW_VERSION_MINOR=1
+
 # Imported source files and paths
 CHIBIOS = modules/ChibiOS
 include board/board.mk
@@ -35,6 +37,7 @@ include $(CHIBIOS)/os/hal/platforms/STM32F1xx/platform.mk
 include $(CHIBIOS)/os/hal/hal.mk
 include $(CHIBIOS)/os/ports/GCC/ARMCMx/STM32F1xx/port.mk
 include $(CHIBIOS)/os/kernel/kernel.mk
+include $(CHIBIOS)/os/various/cpp_wrappers/kernel.mk
 
 LDSCRIPT= $(PORTLD)/STM32F103xC.ld
 
@@ -55,16 +58,40 @@ CSRC += $(wildcard src/*.c)	    \
 		$(wildcard src/*/*.c)	\
 		$(wildcard src/*/*/*.c)
 
-# C++ sources that can be compiled in ARM or THUMB mode depending on the global
-# setting.
-CPPSRC =
+CPPSRC = $(wildcard src/*.cpp)	\
+		 $(wildcard src/*/*.cpp)
+		 
+CPPSRC += $(CHCPPSRC)
 
+#
+# UAVCAN library
+#
+
+UDEFS += -DUAVCAN_STM32_CHIBIOS=1      \
+		 -DUAVCAN_STM32_NUM_IFACES=1   \
+	     -DUAVCAN_STM32_TIMER_NUMBER=1
+		 
+include modules/libuavcan/libuavcan/include.mk
+CPPSRC+= $(LIBUAVCAN_SRC)
+UINCDIR = $(LIBUAVCAN_INC)
+
+include modules/libuavcan/libuavcan_drivers/stm32/driver/include.mk
+CPPSRC += $(LIBUAVCAN_STM32_SRC)
+UINCDIR += $(LIBUAVCAN_STM32_INC)
+
+# Invoke DSDL compiler and add its default output directory to the include search path
+#$(info $(shell $(LIBUAVCAN_DSDLC) $(UAVCAN_DSDL_DIR)))
+UINCDIR += dsdlc_generated      # This is where the generated headers are stored by default
+
+#
+# End ov UAVCAN libray
+#
 
 # List ASM source files here
 ASMSRC = $(PORTASM)
 
 INCDIR = $(PORTINC) $(KERNINC) $(TESTINC) \
-         $(HALINC) $(PLATFORMINC) $(BOARDINC) \
+         $(HALINC) $(PLATFORMINC) $(BOARDINC) $(CHCPPINC)\
          $(CHIBIOS)/os/various os_config
 
 #
@@ -113,10 +140,7 @@ CPPWARN = -Wall -Wextra
 #
 
 # List all user C define here, like -D_DEBUG=1
-UDEFS =
-
-# List all user directories here
-UINCDIR =
+UDEFS +=
 
 # List the user directory to look for the libraries here
 ULIBDIR =
