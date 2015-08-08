@@ -1,6 +1,7 @@
 .dep/*
 build/*
 build/*
+dsdlc_generated/*
 
 #Eclipse project files
 .cproject
