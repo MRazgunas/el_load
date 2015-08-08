@@ -1,65 +1,31 @@
-##############################################################################
-# Build global options
-# NOTE: Can be overridden externally.
-#
-
 # Compiler options here.
-ifeq ($(USE_OPT),)
-  USE_OPT = -O2 -ggdb -fomit-frame-pointer -falign-functions=16
-endif
+USE_OPT = -O2 -ggdb -fomit-frame-pointer -falign-functions=16
 
 # C specific options here (added to USE_OPT).
-ifeq ($(USE_COPT),)
-  USE_COPT = 
-endif
+USE_COPT = 
 
 # C++ specific options here (added to USE_OPT).
-ifeq ($(USE_CPPOPT),)
-  USE_CPPOPT = -fno-rtti
-endif
+USE_CPPOPT = -fno-rtti
 
 # Enable this if you want the linker to remove unused code and data
-ifeq ($(USE_LINK_GC),)
-  USE_LINK_GC = yes
-endif
+USE_LINK_GC = yes
 
 # Linker extra options here.
-ifeq ($(USE_LDOPT),)
-  USE_LDOPT = 
-endif
+USE_LDOPT = 
 
 # Enable this if you want link time optimizations (LTO)
-ifeq ($(USE_LTO),)
-  USE_LTO = no
-endif
+USE_LTO = no
 
 # If enabled, this option allows to compile the application in THUMB mode.
-ifeq ($(USE_THUMB),)
-  USE_THUMB = yes
-endif
+USE_THUMB = yes
 
 # Enable this if you want to see the full log while compiling.
-ifeq ($(USE_VERBOSE_COMPILE),)
-  USE_VERBOSE_COMPILE = no
-endif
+USE_VERBOSE_COMPILE = no
 
+##############################################################################
 #
-# Build global options
-##############################################################################
-
-##############################################################################
-# Architecture or project specific options
-#
-
-#
-# Architecture or project specific options
-##############################################################################
-
-##############################################################################
 # Project, sources and paths
-#
 
-# Define project name here
 PROJECT = el_load
 
 # Imported source files and paths
@@ -70,14 +36,13 @@ include $(CHIBIOS)/os/hal/hal.mk
 include $(CHIBIOS)/os/ports/GCC/ARMCMx/STM32F1xx/port.mk
 include $(CHIBIOS)/os/kernel/kernel.mk
 
-# Define linker script file here
 LDSCRIPT= $(PORTLD)/STM32F103xC.ld
 
-# C sources that can be compiled in ARM or THUMB mode depending on the global
-# setting.
-
-export SRC_BASE := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
-export SRC_DIR = $(abspath $(SRC_BASE)/src)
+VARIOUSSRC = $(CHIBIOS)/os/various/syscalls.c    \
+             $(CHIBIOS)/os/various/chprintf.c    \
+             $(CHIBIOS)/os/various/shell.c       \
+             $(CHIBIOS)/os/various/memstreams.c  \
+             $(CHIBIOS)/os/various/evtimer.c
 
 CSRC = $(PORTSRC) \
        $(KERNSRC) \
@@ -85,37 +50,15 @@ CSRC = $(PORTSRC) \
        $(HALSRC) \
        $(PLATFORMSRC) \
        $(BOARDSRC) \
-       $(CHIBIOS)/os/various/evtimer.c \
-       $(CHIBIOS)/os/various/syscalls.c \
-       src/main.c
 	   
-#CSRC += $(wildcard $(SRC_DIR)/*.c)	\
-#$(wildcard $(SRC_DIR)/*/*.c)		\
-#$(wildcard $(SRC_DIR)/*/*/*.c)
+CSRC += $(wildcard src/*.c)	    \
+		$(wildcard src/*/*.c)	\
+		$(wildcard src/*/*/*.c)
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
 CPPSRC =
 
-# C sources to be compiled in ARM mode regardless of the global setting.
-# NOTE: Mixing ARM and THUMB mode enables the -mthumb-interwork compiler
-#       option that results in lower performance and larger code size.
-ACSRC =
-
-# C++ sources to be compiled in ARM mode regardless of the global setting.
-# NOTE: Mixing ARM and THUMB mode enables the -mthumb-interwork compiler
-#       option that results in lower performance and larger code size.
-ACPPSRC =
-
-# C sources to be compiled in THUMB mode regardless of the global setting.
-# NOTE: Mixing ARM and THUMB mode enables the -mthumb-interwork compiler
-#       option that results in lower performance and larger code size.
-TCSRC =
-
-# C sources to be compiled in THUMB mode regardless of the global setting.
-# NOTE: Mixing ARM and THUMB mode enables the -mthumb-interwork compiler
-#       option that results in lower performance and larger code size.
-TCPPSRC =
 
 # List ASM source files here
 ASMSRC = $(PORTASM)
@@ -134,7 +77,6 @@ INCDIR = $(PORTINC) $(KERNINC) $(TESTINC) \
 
 MCU  = cortex-m3
 
-#TRGT = arm-elf-
 TRGT = arm-none-eabi-
 CC   = $(TRGT)gcc
 CPPC = $(TRGT)g++
@@ -167,37 +109,11 @@ CPPWARN = -Wall -Wextra
 ##############################################################################
 
 ##############################################################################
-# Start of default section
-#
-
-# List all default C defines here, like -D_DEBUG=1
-DDEFS =
-
-# List all default ASM defines here, like -D_DEBUG=1
-DADEFS =
-
-# List all default directories to look for include files here
-DINCDIR =
-
-# List the default directory to look for the libraries here
-DLIBDIR =
-
-# List all default libraries here
-DLIBS =
-
-#
-# End of default section
-##############################################################################
-
-##############################################################################
 # Start of user section
 #
 
 # List all user C define here, like -D_DEBUG=1
 UDEFS =
-
-# Define ASM defines here
-UADEFS =
 
 # List all user directories here
 UINCDIR =
