@@ -60,10 +60,10 @@ endif
 #
 
 # Define project name here
-PROJECT = el
+PROJECT = el_load
 
 # Imported source files and paths
-CHIBIOS = ChibiOS
+CHIBIOS = modules/ChibiOS
 include board/board.mk
 include $(CHIBIOS)/os/hal/platforms/STM32F1xx/platform.mk
 include $(CHIBIOS)/os/hal/hal.mk
