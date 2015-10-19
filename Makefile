@@ -1,11 +1,13 @@
 # Compiler options here.
 USE_OPT = -O2 -fomit-frame-pointer -falign-functions=16
-USE_OPT += -fno-exceptions
+USE_OPT += -fno-exceptions --specs=nosys.specs
+USE_OPT += -lc -lgcc -lm
+
 # C specific options here (added to USE_OPT).
-USE_COPT =
+USE_COPT = -std=c99
 
 # C++ specific options here (added to USE_OPT).
-USE_CPPOPT = -std=c++03 -fno-rtti -fno-threadsafe-statics
+USE_CPPOPT += -std=c++11 -fno-rtti -fno-exceptions -fno-threadsafe-statics
 
 # Enable this if you want the linker to remove unused code and data
 USE_LINK_GC = yes
@@ -69,7 +71,8 @@ CPPSRC += $(CHCPPSRC)
 
 UDEFS += -DUAVCAN_STM32_CHIBIOS=1      \
 		 -DUAVCAN_STM32_NUM_IFACES=1   \
-	     -DUAVCAN_STM32_TIMER_NUMBER=1
+	     -DUAVCAN_STM32_TIMER_NUMBER=2 \
+		 -DSTDOUT_SD=SD1 -DSTDIN_SD=STDOUT_SD
 		 
 include modules/libuavcan/libuavcan/include.mk
 CPPSRC+= $(LIBUAVCAN_SRC)
@@ -81,7 +84,7 @@ UINCDIR += $(LIBUAVCAN_STM32_INC)
 
 # Invoke DSDL compiler and add its default output directory to the include search path
 #$(info $(shell $(LIBUAVCAN_DSDLC) $(UAVCAN_DSDL_DIR)))
-UINCDIR += dsdlc_generated      # This is where the generated headers are stored by default
+UINCDIR += dsdlc_generated
 
 #
 # End ov UAVCAN libray
@@ -110,8 +113,8 @@ CPPC = $(TRGT)g++
 # Enable loading with g++ only if you need C++ runtime support.
 # NOTE: You can use C++ even without C++ support if you are careful. C++
 #       runtime support makes code size explode.
-LD   = $(TRGT)gcc
-#LD   = $(TRGT)g++
+#LD   = $(TRGT)gcc
+LD   = $(TRGT)g++
 CP   = $(TRGT)objcopy
 AS   = $(TRGT)gcc -x assembler-with-cpp
 OD   = $(TRGT)objdump
@@ -123,34 +126,13 @@ BIN  = $(CP) -O binary
 AOPT =
 
 # THUMB-specific options here
-TOPT = -mthumb -DTHUMB
+TOPT = -mthumb -DTHUMB=1
 
-# Define C warning options here
-CWARN = -Wall -Wextra -Wstrict-prototypes
+CWARN += -Wall -Wextra -Werror -Wstrict-prototypes
+CPPWARN += -Wall -Wextra -Werror
 
-# Define C++ warning options here
-CPPWARN = -Wall -Wextra
-
-#
-# Compiler settings
-##############################################################################
-
-##############################################################################
-# Start of user section
-#
-
-# List all user C define here, like -D_DEBUG=1
-UDEFS +=
-
-# List the user directory to look for the libraries here
-ULIBDIR =
-
-# List all user libraries here
-ULIBS =
-
-#
-# End of user defines
-##############################################################################
+# asm statement fix
+DDEFS += -Dasm=__asm
 
 RULESPATH = $(CHIBIOS)/os/ports/GCC/ARMCMx
 include $(RULESPATH)/rules.mk

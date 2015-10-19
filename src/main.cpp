@@ -1,5 +1,13 @@
 #include "ch.h"
 #include "hal.h"
+#include <ch.hpp>
+#include <uavcan_stm32/uavcan_stm32.hpp>
+#include <uavcan/uavcan.hpp>
+#include <uavcan/protocol/global_time_sync_slave.hpp>
+
+
+__attribute__((weak))
+void *__dso_handle;
 
 /*
  * LED blinker thread, times are in milliseconds.
