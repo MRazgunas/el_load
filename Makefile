@@ -1,7 +1,7 @@
 # Compiler options here.
-USE_OPT = -O2 -fomit-frame-pointer -falign-functions=16
-USE_OPT += -fno-exceptions --specs=nosys.specs
-USE_OPT += -lc -lgcc -lm
+USE_OPT = -Os -fomit-frame-pointer -falign-functions=16
+USE_OPT += -fno-exceptions --specs=nosys.specs 
+USE_OPT += -lc -lgcc -nostartfiles #--specs=nano.specs #-lc -lgcc -lm -nodefaultlibs 
 
 # C specific options here (added to USE_OPT).
 USE_COPT = -std=c99
@@ -72,7 +72,8 @@ CPPSRC += $(CHCPPSRC)
 UDEFS += -DUAVCAN_STM32_CHIBIOS=1      \
 		 -DUAVCAN_STM32_NUM_IFACES=1   \
 	     -DUAVCAN_STM32_TIMER_NUMBER=2 \
-		 -DSTDOUT_SD=SD1 -DSTDIN_SD=STDOUT_SD
+		 -DSTDOUT_SD=SD1 -DSTDIN_SD=STDOUT_SD \
+		 -DRELEASE_BUILD=1
 		 
 include modules/libuavcan/libuavcan/include.mk
 CPPSRC+= $(LIBUAVCAN_SRC)
@@ -95,7 +96,7 @@ ASMSRC = $(PORTASM)
 
 INCDIR = $(PORTINC) $(KERNINC) $(TESTINC) \
          $(HALINC) $(PLATFORMINC) $(BOARDINC) $(CHCPPINC)\
-         $(CHIBIOS)/os/various os_config
+         $(CHIBIOS)/os/various os_config src src/sys
 
 #
 # Project, sources and paths
