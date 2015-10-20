@@ -1,56 +1,65 @@
-#include "ch.h"
-#include "hal.h"
 #include <ch.hpp>
-#include <uavcan_stm32/uavcan_stm32.hpp>
+#include <hal.h>
+#include <node2.hpp>
 #include <uavcan/uavcan.hpp>
-#include <uavcan/protocol/global_time_sync_slave.hpp>
 
 
 __attribute__((weak))
 void *__dso_handle;
 
+using namespace chibios_rt;
+
 /*
  * LED blinker thread, times are in milliseconds.
  */
-static WORKING_AREA(waThread1, 128);
-static msg_t Thread1(void *arg) {
+class BlinkerThread : public BaseStaticThread<128> {
+protected:
+    virtual msg_t main(void) {
+        setName("blinker");
+        while (TRUE) {
+            palClearPad(GPIOC, GPIOC_LED1);
+            chThdSleepMilliseconds(500);
+            palSetPad(GPIOC, GPIOC_LED1);
+            chThdSleepMilliseconds(500);
+        }
+    }
+public:
+    BlinkerThread(void) : BaseStaticThread<128>() {
+    }
+};
 
-  (void)arg;
-  chRegSetThreadName("blinker");
-  while (TRUE) {
-    palClearPad(GPIOC, GPIOC_LED1);
-    chThdSleepMilliseconds(500);
-    palSetPad(GPIOC, GPIOC_LED1);
-    chThdSleepMilliseconds(500);
-  }
-  return 0;
-}
+static BlinkerThread blinker;
 
 /*
  * Application entry point.
  */
 int main(void) {
 
-  /*
-   * System initializations.
-   * - HAL initialization, this also initializes the configured device drivers
-   *   and performs the board-specific initializations.
-   * - Kernel initialization, the main() function becomes a thread and the
-   *   RTOS is active.
-   */
-  halInit();
-  chSysInit();
+    /*
+     * System initializations.
+     * - HAL initialization, this also initializes the configured device drivers
+     *   and performs the board-specific initializations.
+     * - Kernel initialization, the main() function becomes a thread and the
+     *   RTOS is active.
+     */
+    halInit();
+    System::init();
 
-  /*
-   * Creates the blinker thread.
-   */
-  chThdCreateStatic(waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
+    //static node_handler::Node node(node_handler::getCanDriver(), node_handler::getSystemClock());
 
-  /*
-   * Normal main() thread activity, in this demo it does nothing except
-   * sleeping in a loop.
-   */
-  while (TRUE) {
-    chThdSleepMilliseconds(1000);
-  }
+    /*
+     * Starts the blinker thread.
+     */
+    blinker.start(NORMALPRIO - 1);
+    UavcanNode::start(2, 1000000);
+
+    /*
+     * Normal main() thread activity, in this demo it does nothing except
+     * sleeping in a loop.
+     */
+    printf("Test app starting");
+    while (TRUE) {
+        //BaseThread::sleep((MS2ST(1000)));
+      //  node.spin(uavcan::MonotonicDuration::fromMSec(1000));
+    }
 }
