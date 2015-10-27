@@ -11,7 +11,7 @@ typedef uavcan::Node<NodeMemoryPoolSize> Node;
 uavcan::ISystemClock& getSystemClock();
 uavcan::ICanDriver& getCanDriver();
 int init();
-
+void run();
 }
 
 #endif /* SRC_NODE_HPP_ */

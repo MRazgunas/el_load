@@ -1,11 +1,7 @@
 #include <ch.hpp>
 #include <hal.h>
 #include <node.hpp>
-#include <uavcan/uavcan.hpp>
-
-
-__attribute__((weak))
-void *__dso_handle;
+//#include <uavcan/uavcan.hpp>
 
 using namespace chibios_rt;
 
@@ -57,7 +53,7 @@ int main(void) {
      * Normal main() thread activity, in this demo it does nothing except
      * sleeping in a loop.
      */
-    printf("Test app starting");
+   // printf("Test app starting");
     while (TRUE) {
         //BaseThread::sleep((MS2ST(1000)));
       //  node.spin(uavcan::MonotonicDuration::fromMSec(1000));

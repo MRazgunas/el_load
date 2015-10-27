@@ -2,8 +2,9 @@
 
 #include <ch.hpp>
 #include <hal.h>
-#include <uavcan/uavcan.hpp>
 #include <uavcan_stm32/uavcan_stm32.hpp>
+
+#include <uavcan/protocol/debug/KeyValue.hpp> // uavcan.protocol.debug.KeyValue
 
 
 namespace node{
@@ -45,17 +46,20 @@ static Node& getNode()
     return node;
 }
 
-class NodeThread: public chibios_rt::BaseStaticThread<3000> {
+class NodeThread: public chibios_rt::BaseStaticThread<1500> {
     protected:
         virtual msg_t main(void) {
+            run();
             return 0; //should never be reached
         }
     public:
-        NodeThread(void) : chibios_rt::BaseStaticThread<3000>() {
+        NodeThread(void) : chibios_rt::BaseStaticThread<1500>() {
         }
     };
 
 static NodeThread node_thread;
+
+uavcan::Publisher<uavcan::protocol::debug::KeyValue> kv_pub(getNode());
 
 int init(){
 
@@ -81,6 +85,10 @@ int init(){
         return node_start_res;
     }
 
+    const int kv_pub_init_res = kv_pub.init();
+    if (kv_pub_init_res < 0) {
+        printf("Failed to start the publisher; error: %i", kv_pub_init_res);
+    }
     /*
      * Informing other nodes that we're ready to work.
      * Default mode is INITIALIZING.
@@ -91,8 +99,28 @@ int init(){
     return 0;
 }
 
-int run() {
+void node_spin_once()
+{
+    const int spin_res = getNode().spin(uavcan::MonotonicDuration::fromMSec(200));
+    if (spin_res < 0) {
+        printf("node spin error %i", spin_res);
+    }
+}
 
-    return 0;
+void run()
+{
+    while (1) {
+        node_spin_once();  // Non-blocking
+
+        uavcan::protocol::debug::KeyValue kv_msg;  // Always zero initialized
+        kv_msg.value = std::rand() / float(RAND_MAX);
+        kv_msg.key = "a";   // "a"
+        kv_msg.key += "b";  // "ab"
+        kv_msg.key += "c";  // "abc"
+        const int pub_res = kv_pub.broadcast(kv_msg);
+        if (pub_res < 0) {
+            printf("KV publication failure: %i", pub_res);
+        }
+    }
 }
 }

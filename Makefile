@@ -1,7 +1,11 @@
 # Compiler options here.
 USE_OPT = -Os -fomit-frame-pointer -falign-functions=16
-USE_OPT += -fno-exceptions --specs=nosys.specs 
-USE_OPT += -lc -lgcc -nostartfiles #--specs=nano.specs #-lc -lgcc -lm -nodefaultlibs 
+USE_OPT += -fno-exceptions #--specs=nosys.specs 
+USE_OPT += -nostartfiles --specs=nano.specs -lc -lgcc -lm -nodefaultlibs
+#USE_OPT += -ffunction-sections -fdata-sections -fno-common 
+#USE_OPT += -fno-unwind-tables -fno-stack-protector 
+#USE_OPT += -ftracer -ftree-loop-distribute-patterns 
+#USE_OPT += -frename-registers -freorder-blocks -fconserve-stack  
 
 # C specific options here (added to USE_OPT).
 USE_COPT = -std=c99
@@ -74,6 +78,7 @@ UDEFS += -DUAVCAN_STM32_CHIBIOS=1      \
 	     -DUAVCAN_STM32_TIMER_NUMBER=2 \
 		 -DSTDOUT_SD=SD1 -DSTDIN_SD=STDOUT_SD \
 		 -DRELEASE_BUILD=1
+#		 -DUAVCAN_TINY=1
 		 
 include modules/libuavcan/libuavcan/include.mk
 CPPSRC+= $(LIBUAVCAN_SRC)

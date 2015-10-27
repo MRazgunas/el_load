@@ -29,6 +29,7 @@ void operator delete[](void*)
     sysPanic("delete");
 }
 
+
 /*
  * stdlibc++ workaround.
  * Default implementations will throw, which causes code size explosion.
@@ -131,3 +132,53 @@ void __cxa_pure_virtual()
 
 }
 
+
+/*
+ * stdio
+ */
+extern "C"
+{
+
+__attribute__((used))
+void abort()
+{
+    while (true) { }
+}
+
+int _read_r(struct _reent*, int, char*, int)
+{
+    return -1;
+}
+
+int _lseek_r(struct _reent*, int, int, int)
+{
+    return -1;
+}
+
+int _write_r(struct _reent*, int, char*, int)
+{
+    return -1;
+}
+
+int _close_r(struct _reent*, int)
+{
+    return -1;
+}
+
+__attribute__((used))
+caddr_t _sbrk_r(struct _reent*, int)
+{
+    return 0;
+}
+
+int _fstat_r(struct _reent*, int, struct stat*)
+{
+    return -1;
+}
+
+int _isatty_r(struct _reent*, int)
+{
+    return -1;
+}
+
+}
