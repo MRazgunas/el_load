@@ -5,7 +5,7 @@
 
 namespace node{
 
-constexpr unsigned NodeMemoryPoolSize = 16384;
+constexpr unsigned NodeMemoryPoolSize = 4096;
 typedef uavcan::Node<NodeMemoryPoolSize> Node;
 
 uavcan::ISystemClock& getSystemClock();

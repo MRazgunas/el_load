@@ -78,7 +78,6 @@ UDEFS += -DUAVCAN_STM32_CHIBIOS=1      \
 	     -DUAVCAN_STM32_TIMER_NUMBER=2 \
 		 -DSTDOUT_SD=SD1 -DSTDIN_SD=STDOUT_SD \
 		 -DRELEASE_BUILD=1
-#		 -DUAVCAN_TINY=1
 		 
 include modules/libuavcan/libuavcan/include.mk
 CPPSRC+= $(LIBUAVCAN_SRC)

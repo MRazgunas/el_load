@@ -9,7 +9,7 @@
 
 namespace node{
 
-static constexpr int RxQueueSize = 64;
+static constexpr int RxQueueSize = 10;
 static constexpr std::uint32_t BitRate = 1000000;
 
 uavcan::ISystemClock& getSystemClock()
